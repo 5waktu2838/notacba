@@ -6,12 +6,18 @@
     <title>Generator Nota BCA 58mm</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
-        
-        .nota-font {
-            font-family: 'Courier Prime', monospace;
-        }
-
+       /* 1. Daftarkan file font lokal kamu */
+    @font-face {
+        font-family: 'FontStrukSaya';
+        src: url('font-struk.otf') format('truetype'); /* Sesuaikan nama file & formatnya */
+        font-weight: normal;
+        font-style: normal;
+    }
+    
+    /* 2. Pasang font tersebut ke struk */
+    .nota-font {
+        font-family: 'FontStrukSaya', monospace;
+    }
         /* CSS KHUSUS CETAK THERMAL 58MM */
         @media print {
             @page {
