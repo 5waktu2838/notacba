@@ -59,9 +59,9 @@
                 <div class="flex flex-col items-center mb-3">
                     <img class="w-16 h-auto object-contain mx-auto" src="logo-bca.png" alt="Logo BCA" onerror="this.onerror=null; this.src='https://placehold.co/240x70?text=Upload+Logo+BCA';">
                     
-                    <div class="font-bold text-center mt-2">DIAMOND HANDPHONE</div>
-                    <div class="text-center text-[9px]">JL. TEUKU UMAR NO. 76</div>
-                    <div class="text-center text-[9px]">DENPASAR</div>
+                    <div id="p-store-name" class="font-bold text-center mt-2">LIMAWAKTU BETRO</div>
+                    <div id="p-store-addr1" class="text-center text-[9px]">JL. RAYA SEDATI AGUNG NO.44</div>
+                    <div id="p-store-addr2" class="text-center text-[9px] hidden"></div>
                 </div>
 
                 <div class="space-y-0.5 pb-1.5 mb-1.5 text-[9px]">
@@ -110,6 +110,12 @@
                 <h2 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Pengaturan Data Nota</h2>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">PILIH CABANG TOKO & ALAMAT</label>
+                        <select id="i-store-select" class="w-full p-2 border rounded-md text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none font-medium">
+                            </select>
+                    </div>
+
                     <div>
                         <label class="block text-xs font-semibold text-gray-600 mb-1">TERM#</label>
                         <div class="flex gap-1">
@@ -188,7 +194,33 @@
     </div>
 
     <script>
+        // Database List Nama Toko & Alamat Lengkap
+        const storeDatabase = [
+            { name: "LIMAWAKTU BETRO", addr1: "JL. RAYA SEDATI AGUNG NO.44", addr2: "" },
+            { name: "LIMAWAKTU KETINTANG", addr1: "JL.KETINTANG BARAT NO.01", addr2: "" },
+            { name: "LIMAWAKTU MAYJEND", addr1: "JL. MAYJEND SUNGKONO NO.11-13", addr2: "" },
+            { name: "LIMAWAKTU PANDAAN 1", addr1: "JL. A YANI NO.143 PANDAAN", addr2: "" },
+            { name: "LIMAWAKTU SUKO PONSEL", addr1: "JL. RAYA BITING SUKO NO.63", addr2: "" },
+            { name: "LIMAWAKTU SUKODONO", addr1: "JL. KEBONAGUNG KM.77 NO.99", addr2: "" },
+            { name: "LIMAWAKTU WAGE", addr1: "PERUM TAMAN SURYA AGUNG BLOK C", addr2: "" },
+            { name: "LIMAWAKTU WARU", addr1: "JL. BRIGJEND KATAMSO NO 37-39 WARU", addr2: "" },
+            { name: "LIMAWAKTU PROBOLINGGO", addr1: "JL. DR SOETOMO NO.149", addr2: "" },
+            { name: "LIMAWAKTU KRAKSAAN", addr1: "JL P SUDIRMAN NO 124 KRAKSAAN", addr2: "" },
+            { name: "LIMAWAKTU SITUBONDO", addr1: "JL. A YANI NO.110E-110F", addr2: "" },
+            { name: "LIMAWAKTU BANYUWANGI", addr1: "JLN. JENDRAL A YANI NO 50A", addr2: "" },
+            { name: "LIMAWAKTU BONDOWOSO", addr1: "JL. RE. MARTADINATA NO.46", addr2: "" },
+            { name: "LIMAWAKTU MONANG MANING", addr1: "JL.GUNUNG RINJANI NO.9 B.4", addr2: "" },
+            { name: "LIMAWAKTU TEUKU UMAR", addr1: "JLN TEUKU UMAR BARAT NO 412", addr2: "" },
+            { name: "EBIKE BONDOWOSO", addr1: "JL. PB SUDIRMAN NO 10", addr2: "" },
+            { name: "AGATHOS PROBOLINGGO", addr1: "JL. DR.SUTOMO NO.174A", addr2: "" },
+            { name: "LIMAWAKTU BONDOWOSO 3", addr1: "JL. KH. WAHID HASYIM NO. 168", addr2: "" },
+            { name: "LIMAWAKTU JEMBER 2", addr1: "JL KALIMANTAN NO 72", addr2: "" },
+            { name: "LIMAWAKTU PROBOLINGGO1", addr1: "JL DOKTER SOETOMO NO 23/24", addr2: "" },
+            { name: "LIMAWAKTU ASEMBAGUS", addr1: "JL. PANTURA SITUBONDO BANYUWANGI NO. 216", addr2: "" }
+        ];
+
         const defaultData = {
+            storeIndex: 0, // Default memilih index ke-0 (Betro)
             term: "D2CQ06352",
             card: "7763",
             name: "RINDY PRATIWI",
@@ -205,13 +237,9 @@
         const fields = ['term', 'card', 'name', 'batch', 'trace', 'ref', 'appr', 'total', 'security'];
         const months = ["JAN", "FEB", "MAR", "APR", "MEI", "JUN", "JUL", "AGU", "SEP", "OKT", "NOV", "DES"];
 
-        // Fungsi Memformat Angka Murni menjadi Format Rupiah Berbintang/Titik
         function formatRupiah(value) {
-            // Bersihkan semua karakter kecuali angka
             let num = value.replace(/[^0-9]/g, '');
             if (!num) return '';
-            
-            // Tambahkan titik setiap kelipatan 3 angka dari belakang
             let formatted = num.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
             return 'Rp. ' + formatted;
         }
@@ -230,7 +258,44 @@
             return `${date} ${month} ${year} ${hours}:${minutes}`;
         }
 
+        // Fungsi Memperbarui Teks Tampilan Alamat di Struk Preview
+        function updateStoreDisplay(index) {
+            const store = storeDatabase[index] || storeDatabase[0];
+            
+            document.getElementById('p-store-name').innerText = store.name;
+            document.getElementById('p-store-addr1').innerText = store.addr1;
+            
+            const addr2El = document.getElementById('p-store-addr2');
+            if (store.addr2) {
+                addr2El.innerText = store.addr2;
+                addr2El.classList.remove('hidden');
+            } else {
+                addr2El.classList.add('hidden');
+            }
+        }
+
         function initApp() {
+            // 1. Generate Opsi ke Elemen Dropdown HTML
+            const selectEl = document.getElementById('i-store-select');
+            selectEl.innerHTML = ''; // bersihkan data lama
+            storeDatabase.forEach((store, idx) => {
+                const option = document.createElement('option');
+                option.value = idx;
+                option.text = `${store.name} - ${store.addr1}`;
+                selectEl.appendChild(option);
+            });
+
+            // Set value terpilih dari localstorage/default
+            selectEl.value = savedData.storeIndex !== undefined ? savedData.storeIndex : 0;
+            updateStoreDisplay(selectEl.value);
+
+            // Pasang event saat dropdown diubah
+            selectEl.addEventListener('change', () => {
+                updateStoreDisplay(selectEl.value);
+                saveCurrentData();
+            });
+
+            // 2. Inisialisasi input kolom lainnya
             fields.forEach(field => {
                 const inputEl = document.getElementById(`i-${field}`);
                 const previewEl = document.getElementById(`p-${field}`);
@@ -242,12 +307,9 @@
                     if (field === 'card') {
                         inputEl.value = inputEl.value.replace(/[^0-9]/g, '');
                     }
-                    
-                    // Logika Khusus Auto-Format Rupiah ketika mengetik nominal harga
                     if (field === 'total') {
                         inputEl.value = formatRupiah(inputEl.value);
                     }
-
                     previewEl.innerText = inputEl.value || (field === 'total' ? 'Rp. 0' : '');
                     saveCurrentData();
                 });
@@ -271,6 +333,7 @@
                 currentData[field] = document.getElementById(`i-${field}`).value;
             });
             currentData['datetime'] = document.getElementById('i-datetime').value;
+            currentData['storeIndex'] = document.getElementById('i-store-select').value;
             localStorage.setItem('bca_nota_data', JSON.stringify(currentData));
         }
 
@@ -280,8 +343,6 @@
             for (let i = 0; i < length; i++) {
                 result += chars.charAt(Math.floor(Math.random() * chars.length));
             }
-            
-            // Jika yang diacak adalah total nominal, format dulu sebelum dilempar (opsional ekstensi depan)
             if (field === 'total') {
                 result = formatRupiah(result);
             }
