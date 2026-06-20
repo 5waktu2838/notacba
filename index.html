@@ -91,7 +91,7 @@
 
                 <div class="flex justify-between font-bold text-xs my-2">
                     <div>TOTAL</div>
-                    <div id="p-total">Rp. 12,999,000</div>
+                    <div id="p-total">Rp. 12.999.000</div>
                 </div>
 
                 <div class="text-center my-3 font-bold text-[8px] tracking-tight">
@@ -163,7 +163,7 @@
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold text-gray-600 mb-1">TOTAL NOMINAL</label>
-                        <input type="text" id="i-total" class="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="text" id="i-total" placeholder="Contoh: 1250000" class="w-full p-2 border rounded-md text-sm focus:ring-2 focus:ring-blue-500 outline-none font-semibold">
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-semibold text-gray-600 mb-1">SECURITY CODE</label>
@@ -197,13 +197,24 @@
             trace: "000707",
             ref: "000062",
             appr: "00308734",
-            total: "Rp. 12,999,000",
+            total: "Rp. 12.999.000",
             security: "67E8F8B143/ANS035VB"
         };
 
         let savedData = JSON.parse(localStorage.getItem('bca_nota_data')) || defaultData;
         const fields = ['term', 'card', 'name', 'batch', 'trace', 'ref', 'appr', 'total', 'security'];
         const months = ["JAN", "FEB", "MAR", "APR", "MEI", "JUN", "JUL", "AGU", "SEP", "OKT", "NOV", "DES"];
+
+        // Fungsi Memformat Angka Murni menjadi Format Rupiah Berbintang/Titik
+        function formatRupiah(value) {
+            // Bersihkan semua karakter kecuali angka
+            let num = value.replace(/[^0-9]/g, '');
+            if (!num) return '';
+            
+            // Tambahkan titik setiap kelipatan 3 angka dari belakang
+            let formatted = num.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            return 'Rp. ' + formatted;
+        }
 
         function formatStrukDate(isoString) {
             if (!isoString) return "";
@@ -231,7 +242,13 @@
                     if (field === 'card') {
                         inputEl.value = inputEl.value.replace(/[^0-9]/g, '');
                     }
-                    previewEl.innerText = inputEl.value;
+                    
+                    // Logika Khusus Auto-Format Rupiah ketika mengetik nominal harga
+                    if (field === 'total') {
+                        inputEl.value = formatRupiah(inputEl.value);
+                    }
+
+                    previewEl.innerText = inputEl.value || (field === 'total' ? 'Rp. 0' : '');
                     saveCurrentData();
                 });
             });
@@ -264,6 +281,11 @@
                 result += chars.charAt(Math.floor(Math.random() * chars.length));
             }
             
+            // Jika yang diacak adalah total nominal, format dulu sebelum dilempar (opsional ekstensi depan)
+            if (field === 'total') {
+                result = formatRupiah(result);
+            }
+
             document.getElementById(`i-${field}`).value = result;
             document.getElementById(`p-${field}`).innerText = result;
             saveCurrentData();
